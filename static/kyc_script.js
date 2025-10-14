@@ -1,0 +1,208 @@
+let lastscore = null;
+let timerInterval;
+let isTimerRunning = false;
+let timeRemaining = 240;
+let playerAScore = { D: 0, T: 0 };
+let playerBScore = { D: 0, T: 0 };
+
+function changeColorAndIncrementScore(element, targetPlayer, scoreBoxIndex) {
+    // 改变颜色
+    element.style.backgroundColor = 'yellow';
+
+    // 增加目标玩家的分数
+    let scoreBoxes = document.querySelectorAll(`.${targetPlayer} .score-box`);
+    let scoreBox = scoreBoxes[scoreBoxIndex];
+    let score = parseInt(scoreBox.innerText);
+    scoreBox.innerText = score + 1;
+
+    if (targetPlayer === 'score-area_A') {
+        lastscore = 'A';
+    } else {
+        lastscore = 'B';
+    }
+    // 记录由 D 或 T 加分
+    if (element.innerText === 'D') {
+        if (targetPlayer === 'score-area_A') {
+            playerBScore.D += 1;
+        } else {
+            playerAScore.D += 1;
+        }
+    } else if (element.innerText === 'T') {
+        if (targetPlayer === 'score-area_A') {
+            playerBScore.T += 1;
+        } else {
+            playerAScore.T += 1;
+        }
+    }
+
+    checkForWinner();
+}
+
+function incrementScore(element) {
+    let score = parseInt(element.innerText);
+    score += 1;
+    element.innerText = score;
+    
+
+    let player = element.closest('.players').classList.contains('player-a') ? 'A' : 'B';
+    lastScore = player;
+
+    checkForWinner();
+}
+
+
+function checkForWinner() {
+    let playerAScore1 = parseInt(document.querySelector('.score-area_A .score-box:nth-child(1)').innerText);
+    let playerAScore2 = parseInt(document.querySelector('.score-area_A .score-box:nth-child(2)').innerText);
+
+    let playerBScore1 = parseInt(document.querySelector('.score-area_B .score-box:nth-child(1)').innerText);
+    let playerBScore2 = parseInt(document.querySelector('.score-area_B .score-box:nth-child(2)').innerText);
+
+    if (playerAScore1 === 1 || playerAScore2 === 2) {
+        // document.querySelector('.player-a .crown-icon').style.display = 'inline';
+        showCrownForPlayer('A');
+        showRefreshButton();
+        stopTimerAndHighlight();
+    }
+
+    if (playerBScore1 === 1 || playerBScore2 === 2) {
+        // document.querySelector('.player-b .crown-icon').style.display = 'inline';
+        showCrownForPlayer('B');
+        showRefreshButton();
+        stopTimerAndHighlight();
+    }
+}
+
+function stopTimerAndHighlight() {
+    clearInterval(timerInterval);  // 停止计时器
+    isTimerRunning = false;
+    document.querySelector('.timer').style.backgroundColor = 'red';  // 设置计时器背景为红色
+}
+
+// 现有的计时器相关代码保持不变
+
+function showCrownForPlayer(player) {
+    setTimeout(function() {
+        let confirmation = confirm("是否顯示王冠？");
+        if (confirmation) {
+            if (player === 'A') {
+                document.querySelector('.player-a .crown-icon').style.display = 'inline';
+            } else if (player === 'B') {
+                document.querySelector('.player-b .crown-icon').style.display = 'inline';
+            }
+        } else {
+            pass;
+        }
+    }, 500);
+    
+}
+
+
+
+function updateTimer() {
+    if (timeRemaining > 0) {
+        timeRemaining--;
+        updateTimerDisplay();
+    } else {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        document.querySelector('.timer').style.backgroundColor = 'red';  // 设置计时器背景为红色
+        checkForWinnerOnTimeout(); // 时间到后判定胜负
+    }
+}
+function checkForWinnerOnTimeout() {
+    let playerAScore2 = parseInt(document.querySelector('.score-area_A .score-box:nth-child(2)').innerText);
+    let playerBScore2 = parseInt(document.querySelector('.score-area_B .score-box:nth-child(2)').innerText);
+
+    let playerAScore3 = parseInt(document.querySelector('.score-area_A .score-box:nth-child(3)').innerText);
+    let playerBScore3 = parseInt(document.querySelector('.score-area_B .score-box:nth-child(3)').innerText);
+
+    // 判定 score box 2 的得分
+    if (playerAScore2 > playerBScore2) {
+        showRefreshButton();
+        showCrownForPlayer('A');
+        
+    } else if (playerBScore2 > playerAScore2) {
+        showRefreshButton();
+        showCrownForPlayer('B');
+    } else { // 若 score box 2 得分相同
+        if (playerAScore.D > playerBScore.D) {
+            showRefreshButton();
+            showCrownForPlayer('A');
+        } else if (playerBScore.D > playerAScore.D) {                
+            showRefreshButton();
+            showCrownForPlayer('B');
+        } else {
+            // 判定 score box 3 的得分
+            if (playerAScore3 > playerBScore3) {
+                showRefreshButton();
+                showCrownForPlayer('A');
+            } else if (playerBScore3 > playerAScore3) {
+                showRefreshButton();
+                showCrownForPlayer('B');
+            } else { // 若 score box 3 得分相同
+                if (playerAScore.T > playerBScore.T) {
+                    showRefreshButton();
+                    showCrownForPlayer('A');
+                } else if (playerBScore.T > playerAScore.T) {
+                    showRefreshButton();
+                    showCrownForPlayer('B');
+                } else {
+                    
+                    showRefreshButton();
+                    // 如果所有条件都相同，最后得分者胜
+                    if (lastscore == 'A'){
+                        showCrownForPlayer('A');
+                    }   else{
+                        showCrownForPlayer('B');
+                    }
+                }
+            }
+        }
+    }
+}
+
+function showRefreshButton() {
+    document.querySelector('.refresh-button').style.display = 'inline';
+}
+
+function updateTimerDisplay() {
+    let minutes = Math.floor(timeRemaining / 60);
+    let seconds = timeRemaining % 60;
+    document.querySelector('.timer').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function toggleTimer() {
+    if (isTimerRunning) {
+        clearInterval(timerInterval);
+    } else {
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    isTimerRunning = !isTimerRunning;
+}
+
+function setTimer(minutes, seconds) {
+    timeRemaining = minutes * 60 + seconds;
+    updateTimerDisplay();
+}
+
+function openSettings() {
+    let timeInput = prompt("請輸入倒數時間 (格式: MM:SS)", "5:00");
+    if (timeInput) {
+        let timerParts = timeInput.split(':');
+        let minutes = parseInt(timerParts[0]);
+        let seconds = parseInt(timerParts[1]);
+        if (!isNaN(minutes) && !isNaN(seconds)) {
+            setTimer(minutes, seconds);
+        } else {
+            alert("請輸入有效的時間格式");
+        }
+    }
+}
+
+document.querySelector('.timer').addEventListener('dblclick', function() {
+    openSettings();
+});
+function refreshPage() {
+    window.location.reload();
+}

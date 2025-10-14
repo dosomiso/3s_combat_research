@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比賽畫面</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='kyc_judo_styles.css') }}">
+    <style>
+        /* Header - Selection Area */
+        .selection-header {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Main header - match title */
+        .header {
+            font-size: 1.2rem;/* 調整字體大小 */
+            text-align: center;
+            margin: 10px 0;/* 增加 margin，讓標題有更多間距 */
+            white-space: normal;
+        }
+
+        /* Scoreboard Container - White and Blue areas */
+        .players-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0; /* 移除區塊之間的垂直間隙 */
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .players {
+            display: flex;
+            align-items: center; /* 垂直置中 */
+            flex-direction: column;
+            justify-content: center; /* 水平置中 */
+            padding: 10px;
+            width: 100%;
+            max-width: 600px; /* 限制最大寬度 */
+            height: 190px; /* 如果需要，可以再增加高度 */
+            box-sizing: border-box;
+            border: 2px solid #000;
+            position: relative;/* 讓子元素絕對定位基於這個父元素 */
+            margin: 0 auto;
+        }
+
+        .player-a {
+            background-color: #fff;
+        }
+
+        .player-b {
+            background-color: #1E90FF;
+        }
+
+        /* Score Box */
+        .score-box {
+            font-size: 4rem;
+            width: 180px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #000;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%); /* 使用 translateX 來水平置中 */
+            margin-left: 60px; /* 手動調整的左邊距 */ 
+        }
+
+        /* Timer within Score Panel */
+        .takedown-time {
+            font-size: 2rem !important;
+            position: absolute !important;
+            right: 8px !important;
+            color: black !important;
+        }
+
+        /* Bottom Countdown Timer */
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.3rem; /* 調整字體大小 */
+            width: 160px; /* 調整寬度 */
+            height: 80px; /* 調整高度 */
+            background-color: red;
+            color: yellow;
+            border: 1px solid #fff;
+            border-radius: 8px;
+            margin: 15px auto;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Timer Text - 中央對齊 */
+        .timer-container .timer {
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+        }
+
+        /* Settings Icon - Positioned slightly further to the right */
+        .settings-button {
+            position: absolute;
+            right: -70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 9999;
+        }
+
+        /* Yellow Card Boxes */
+        .yellow-boxes {
+            display: flex;
+            flex-direction: column; /* 改為垂直排列 */
+            gap: 5px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        /* Adjust Yellow Card Position */
+        .yellow-toggle-container {
+            position: absolute;
+            top: 50%;
+            right: -50px; /* 向右偏移，確保黃牌位於計分板外 */
+            transform: translateY(-50%);
+        }
+
+/* Responsive Adjustments */
+/* 針對手機螢幕進行調整，不影響電腦 */
+@media (max-width: 800px) {
+    .score-box {
+        width: 100%!important; /* 適當寬度 */
+        max-width: 240px!important;
+        height: 140px!important;
+        font-size: 3.5rem!important;
+        margin: 0 auto!important;/* 確保居中 */
+        transform: translateX(1%)!important; /* 輕微偏右 */
+    }
+}
+
+@media (max-width: 800px) {
+    .header {
+        font-size: 1.2rem !important;
+    }
+
+    .players {
+        max-width: 90% !important;
+        height: 150px !important;
+    }
+
+    .score-box {
+        font-size: 1.5rem !important;
+        width: 70px !important;
+        height: 70px !important;
+        margin: 10px auto;
+    }
+
+    .takedown-time {
+        font-size: 1.2rem !important;
+        right: 5px !important;
+    }
+
+    /* Countdown Timer for Mobile */
+    .timer-container {
+        font-size: 1.8rem !important;
+        width: 140px !important;
+        height: 60px !important;
+    }
+
+    /* Adjust Yellow Card Position on Mobile */
+    .yellow-toggle-container {
+        position: absolute;
+        top: 50%;
+        right: -7px; /* 手機上向內縮小偏移量，確保黃牌在可見範圍內 */
+        transform: translateY(-50%);
+    }
+}
+
+@media (min-width: 800px) {
+    /* Adjust Yellow Card Position on Desktop */
+    .yellow-toggle-container {
+        position: absolute;
+        top: 50%;
+        right: -50px; /* 電腦上保持在計分框外側 */
+        transform: translateY(-50%);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 選單區域：僅當 data_loaded 為 False 時顯示 -->
+        {% if not data_loaded %}
+        <form action="/jload_data" method="POST">
+            <label for="filename" class="file-select">選擇比賽項目:</label>
+            <select name="filename" id="filename">
+                {% for file in files %}
+                <option value="{{ file }}">{{ file }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">載入</button>
+        </form>
+        {% endif %}
+        
+        <div class="header">
+            {{ number or "場序128" }}  {{ subject or "社會男子組-81KG" }}
+        </div>
+        
+        <div class="players-container">
+            <div class="players player-a">
+                <div class="takedown-time" id="player1-score" onclick="takedownIncrement('player1-score', document.querySelector('.player-b .score-box'))">0</div>
+                <div class="player-name">
+                    <img src="{{ url_for('static', filename='crown.png') }}" alt="Crown" class="crown-icon">
+                    {{ player1_name or "選手一" }}
+                </div>
+                <div class="country-code" style="color: black;">{{player1_place or "TPE"}}</div>
+
+                <div class="score-area_A">
+                    <div class="score-box" onclick="incrementScore(this)">0</div>
+                </div>
+                <div class="yellow-boxes player-a-yellow-boxes">
+                    <div class="yellow-box"></div>
+                    <div class="yellow-box"></div>
+                    <div class="red-box"></div>
+                </div>
+                <div class="yellow-toggle-container">
+                    <button class="yellow_toggle-button" onclick="toggleYellowBoxes('player-a-yellow-boxes', document.querySelector('.player-b .score-box'))">黃牌</button>
+                </div>
+            </div>
+            
+            <div class="players player-b">
+                <div class="country-code" style="color: black;">{{player2_place or "UZB"}}</div>
+                
+                <div class="score-area_B">
+                    <div class="score-box" onclick="incrementScore(this)">0</div>
+                </div>
+                <div class="yellow-boxes player-b-yellow-boxes">
+                    <div class="yellow-box"></div>
+                    <div class="yellow-box"></div>
+                    <div class="red-box"></div>
+                </div>
+                <div class="yellow-toggle-container">
+                    <button class="yellow_toggle-button" onclick="toggleYellowBoxes('player-b-yellow-boxes', document.querySelector('.player-a .score-box'))">黃牌</button>
+                </div>
+                
+                <div class="takedown-time" id="player2-score" onclick="takedownIncrement('player2-score', document.querySelector('.player-a .score-box'))">0</div>
+                <div class="player-name">
+                    <img src="{{ url_for('static', filename='crown.png') }}" alt="Crown" class="crown-icon">
+                    {{ player2_name or "選手二" }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="timer-container">
+            <div class="gs-text" style="display: none; font-size: 24px; margin-right: 8px; color: #ffd700;">GS</div>
+            <div class="timer" onclick="toggleTimer()">04:00</div>
+            <button class="settings-button" onclick="openSettings()">
+                <img src="https://img.icons8.com/material-outlined/48/ffffff/settings.png" alt="Settings Icon">
+            </button>
+        </div>
+      
+    </div>
+    
+    <script src="{{ url_for('static', filename='judo_script.js') }}"></script>
+    
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比賽項目組別</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='wrest_styles.css') }}">
+    <style>
+        .crown-icon {
+            display: none;
+            width: 25px;  
+            height: 25px; 
+            margin-left: 5px;  
+            vertical-align: middle; 
+        }
+        
+        .refresh-button {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .refresh-button img {
+            width: 24px;  
+            height: 24px; 
+            margin-left: 10px; 
+            cursor: pointer;
+        }
+        
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+            height: 80px;
+            margin: 10px auto;
+            position: relative;
+            top: -15px;
+            box-sizing: border-box;
+        }
+
+        .timer-container .timer {
+            font-size: 3rem;
+            color: yellow;
+            background-color: transparent;
+            padding: 10px;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-button {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .info div {
+            font-size: 1.2rem; /* 調整標題字體大小 */
+            text-align: center;
+            color: rgb(200, 220, 24);
+            margin: 5px auto;
+            font-weight: bold;
+            max-width: 95%; /* 限制標題的最大寬度 */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* 手機裝置上的調整 */
+        @media (max-width: 768px) {
+            .timer-container {
+                width: 120px;
+                height: 60px;
+                top: -10px;
+            }
+
+            .timer-container .timer {
+                font-size: 2.5rem;
+            }
+
+            .settings-button {
+                right: -60px; /* 微調手機上齒輪的位置 */
+            }
+
+            .scoreboard {
+                display: flex;
+                flex-direction: row;
+                gap: 1px; /* 減少中間的間隙 */
+            }
+
+            .team {
+                width: 55%; /* 調整計分板寬度以適應屏幕 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if not data_loaded %}
+        <form action="/wload_data" method="POST">
+            <label for="filename" class="file-select">選擇比賽項目:</label>
+            <select name="filename" id="filename">
+                {% for file in files %}
+                <option value="{{ file }}">{{ file }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">載入</button>
+        </form>
+        {% endif %}
+
+        <div class="info">
+            <div>
+                {{ subject or "社會男子組-81KG" }}  {{ number or "總場128" }}
+            </div>
+        </div>
+
+        <div class="scoreboard">
+            <div class="team blue">
+                <div class="team-name">{{player1_place or "TPE"}}</div>
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='crown.png') }}" alt="Crown" class="crown-icon">
+                    {{ player1_name or "選手一" }}
+                </div>
+                
+                <div class="penalty-table">
+                    <table>
+                        <tr>
+                            <td onclick="incrementCorrespondingCell(0, this, 'blue')">1分</td>
+                            <td onclick="incrementCorrespondingCell(1, this, 'blue')">3分</td>
+                            <td onclick="incrementCorrespondingCell(2, this, 'blue')">警告</td>
+                        </tr>
+                        <tr>
+                            <td><input type="number" value="0" min="0" class="score-input" id="blue-score1" onchange="manualScoreUpdate('blue')"></td>
+                            <td><input type="number" value="0" min="0" class="score-input" id="blue-score2" onchange="manualScoreUpdate('blue')"></td>
+                            <td><input type="number" value="0" min="0" class="score-input" id="blue-score3" onchange="manualScoreUpdate('red')"></td>
+                        </tr>
+                    </table>
+                </div>
+            
+                <div class="score" id="blue-total-score">0</div>
+                <div class="leader" onclick="toggleLeader(this)"></div>
+            </div>
+            
+            <div class="team red">
+                <div class="team-name">{{player2_place or "UZB"}}</div>
+                <div class="team-member">
+                    <img src="{{ url_for('static', filename='crown.png') }}" alt="Crown" class="crown-icon">
+                    {{ player2_name or "選手二" }}
+                </div>
+                
+                <div class="penalty-table">
+                    <table>
+                        <tr>
+                            <td onclick="incrementCorrespondingCell(0, this, 'red')">1分</td>
+                            <td onclick="incrementCorrespondingCell(1, this, 'red')">3分</td>
+                            <td onclick="incrementCorrespondingCell(2, this, 'red')">警告</td>
+                        </tr>
+                        <tr>
+                            <td><input type="number" value="0" min="0" class="score-input" id="red-score1" onchange="manualScoreUpdate('red')"></td>
+                            <td><input type="number" value="0" min="0" class="score-input" id="red-score2" onchange="manualScoreUpdate('red')"></td>
+                            <td><input type="number" value="0" min="0" class="score-input" id="red-score3" onchange="manualScoreUpdate('blue')"></td>
+                        </tr>
+                    </table>
+                </div>
+            
+                <div class="score" id="red-total-score">0</div>
+                <div class="leader" onclick="toggleLeader(this)"></div>
+            </div>
+            
+        </div>
+
+        <div class="timer-container">
+            <div class="timer" onclick="toggleTimer()">04:00</div>
+            <button class="settings-button" onclick="openSettings()" style="background: none; border: none; cursor: pointer;">
+                <img src="https://img.icons8.com/material-outlined/48/ffffff/settings.png" alt="Settings Icon">
+            </button>
+            <button class="refresh-button" onclick="refreshPage()" style="background: none; border: none; cursor: pointer;">
+                <img src="https://img.icons8.com/material-outlined/48/ffffff/refresh.png" alt="Refresh Icon">
+            </button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='wrest_script.js') }}"></script>
+</body>
+</html>

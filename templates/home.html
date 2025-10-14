@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首頁</title>
+    <style>
+        body {
+            background-color: #3f165a;
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+        }
+        .sections {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 900px;
+        }
+        .section {
+            width: 250px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .section a {
+            display: block;
+            padding: 10px;
+            margin: 10px 0;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+        /* 柔道區塊 (白色系) */
+        .judo-section {
+            background-color: #f0f0f0;
+            color: black;
+        }
+        .judo-section a {
+            background-color: #666;
+            color: white;
+        }
+        .judo-section a:hover {
+            background-color: #444;
+        }
+        /* 克拉術區塊 (綠色系) */
+        .kyc-section {
+            background-color: #d4edda;
+            color: black;
+        }
+        .kyc-section a {
+            background-color: #4caf50;
+            color: white;
+        }
+        .kyc-section a:hover {
+            background-color: #388e3c;
+        }
+        /* 摔角區塊 (藍色系) */
+        .wrest-section {
+            background-color: #cce5ff;
+            color: black;
+        }
+        .wrest-section a {
+            background-color: #007bff;
+            color: white;
+        }
+        .wrest-section a:hover {
+            background-color: #0056b3;
+        }
+        /* 後台 (顯眼度降低) */
+        .admin {
+            margin-top: 20px;
+            color: #bbb;
+            font-size: 16px;
+        }
+        .admin a {
+            color: #bbb;
+            text-decoration: underline;
+        }
+        .admin a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>歡迎來到首頁</h1>
+    <div class="sections">
+        <!-- 柔道區塊 -->
+        <div class="section judo-section">
+            <h2>柔道</h2>
+            <a href="/judo_display">柔道檢錄</a>
+            <a href="/jscore">柔道計分</a>
+        </div>
+        <!-- 克拉術區塊 -->
+        <div class="section kyc-section">
+            <h2>克拉術</h2>
+            <a href="/kyc_display">克拉術檢錄</a>
+            <a href="/kycscore">克拉術計分</a>
+        </div>
+        <!-- 摔角區塊 -->
+        <div class="section wrest-section">
+            <h2>摔角</h2>
+            <a href="/wrest_display">摔角檢錄</a>
+            <a href="/wscore">摔角計分</a>
+        </div>
+    </div>
+    <!-- 後台連結，顯眼度降低 -->
+    <div class="admin">
+        <a href="/edit">後台</a>
+    </div>
+</body>
+</html>
