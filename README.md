@@ -1,35 +1,45 @@
-# 3s_hit_competition
-技擊類競賽
+# 🥋 3S Combat Research System (技擊類競賽即時評分系統)
 
+> A cloud-deployed research version of the 3S Combat System, supporting live scoring and event management for judo, wrestling, and kyc (克拉柔) competitions.  
+> This deployment runs on **Railway.app** with a Python Flask backend.
 
-網站資訊如下:</br>
-IP:120.107.135.104</br>
-ID: hkvcadmin</br>
-PassWD: Hkvu4wj/3
+---
 
-combats.hk.edu.tw</br>
-網頁密碼:fachen369198*
+## 🌐 Demo Website
 
+🔗 **Public URL (Production):**  
+https://3scombatresearch-production.up.railway.app/  
+🔒 **Access Password:** `91367**` *(for research demo only)*
 
-github repo:</br>
-https://github.com/leonardo-lin/3s_hit_competition.git
+---
 
+## 🧠 Project Overview
 
-app.py: 主要啟動程式</br>
-test.py: Local測試用 python3 test.py 後可以在 127.0.0.1:5000 檢視自己的網頁 </br>
-wrest: 摔角相關資訊</br>
-kyc: 克拉柔相關資訊</br>
-judo: 柔道相關資訊</br>
+This project extends the original **3S Hit Competition System** to support academic research and online deployment.  
+It enables real-time score submission, event visualization, and result storage through a Flask backend.
 
+### 📦 Main Components
+| Folder/File | Description |
+|--------------|-------------|
+| `app.py` | Main Flask application (production entry point) |
+| `test.py` | Local testing script — run `python3 test.py` to preview at `127.0.0.1:5000` |
+| `kyc/` | 克拉柔比賽相關模組 |
+| `judo/` | 柔道比賽模組 |
+| `wrest/` | 摔角比賽模組 |
 
+---
 
+## 🧰 Environment Setup
 
+### Local Development
+```bash
+# Clone repository
+git clone https://github.com/leonardo-lin/3s_hit_competition.git
+cd 3s_hit_competition
 
+# Install dependencies
+pip install -r requirements.txt
 
-我們的服務是使用80 port 對外公開，但80 port在主機中有預設的公開頁面會擋到我們，因此在如果主機被重新開機，80 port就會被占用</br>
-若發現被占用時可以kill正在使用該port的process來啟用我們的服務</br>
-以下是啟動方法
-
-sudo lsof -i :80 看誰在用80</br>
-sudo kill PID</br>
-nohup sudo python3 app.py >& log.txt & 服務啟用
+# Run locally
+python3 test.py
+# Then open http://127.0.0.1:5000
