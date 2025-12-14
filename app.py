@@ -164,7 +164,7 @@ def edit_file(filename):
 
 
 
-# 顯示所有.xlsx檔案表格 (摔角前台)
+# 顯示所有.xlsx檔案表格 (角力前台)
 @app.route('/wrest_display')
 def wrest_overview():
     # 前台頁面
