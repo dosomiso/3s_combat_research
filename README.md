@@ -25,7 +25,7 @@ It enables real-time score submission, event visualization, and result storage t
 | `test.py` | Local testing script — run `python3 test.py` to preview at `127.0.0.1:5000` |
 | `kyc/` | 克拉柔比賽相關模組 |
 | `judo/` | 柔道比賽模組 |
-| `wrest/` | 摔角比賽模組 |
+| `wrest/` | 角力比賽模組 |
 
 ---
 
